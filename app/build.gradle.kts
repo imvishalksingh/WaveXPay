@@ -71,4 +71,5 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation("androidx.compose.material:material-icons-extended")
 
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }

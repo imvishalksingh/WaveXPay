@@ -1,12 +1,15 @@
 package com.productivityservicehub.wavexpay.presentation.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.navigation.NavType
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.productivityservicehub.wavexpay.ComingSoonScreen
+import com.productivityservicehub.wavexpay.domain.data.UserPreferences
+import com.productivityservicehub.wavexpay.presentation.SplashScreen
 import com.productivityservicehub.wavexpay.presentation.login.LoginScreen
 import com.productivityservicehub.wavexpay.presentation.home.HomeScreen
 import com.productivityservicehub.wavexpay.presentation.home.topbar.NotificationsScreen
@@ -15,40 +18,56 @@ import com.productivityservicehub.wavexpay.presentation.home.qr.QRScannerScreen
 import com.productivityservicehub.wavexpay.presentation.login.OtpVerificationScreen
 import com.productivityservicehub.wavexpay.presentation.wallet.WalletApp
 import com.productivityservicehub.wavexpay.presentation.wallet.transactions.Transaction
-import com.productivityservicehub.wavexpay.presentation.wallet.transactions.TransactionDetailScreen
-import com.productivityservicehub.wavexpay.presentation.wallet.transactions.TransactionHistoryScreen
 import com.productivityservicehub.wavexpay.presentation.wallet.transactions.getAllTransactions
+import kotlinx.coroutines.launch
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun WaveXApp(onRequestCameraPermission: () -> Unit) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val userPreferences = remember { UserPreferences(context) }
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "splash"
     ) {
+        composable("splash") {
+            SplashScreen(navController, userPreferences)
+        }
+
         composable("login") {
             LoginScreen(
                 onContinue = { phoneNumber ->
-                    // Handle OTP screen navigation or API call
                     navController.navigate("otp/$phoneNumber")
                 }
             )
         }
+
         composable(
             "otp/{phone}",
             arguments = listOf(navArgument("phone") { defaultValue = "" })
         ) { backStackEntry ->
             val phone = backStackEntry.arguments?.getString("phone") ?: ""
+            val context = LocalContext.current
+            val userPreferences = remember { UserPreferences(context) }
+            val scope = rememberCoroutineScope() // ✅ Create here (in composable scope)
+
             OtpVerificationScreen(
                 phoneNumber = phone,
                 onVerifyOtp = { otp ->
-                    // Handle OTP verification logic
-                    navController.navigate("home")
+                    // ✅ Use the scope here
+                    scope.launch {
+                        userPreferences.setLoggedIn(true)
+                    }
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             )
         }
+
 
         composable("home") {
             HomeScreen(
@@ -57,7 +76,7 @@ fun WaveXApp(onRequestCameraPermission: () -> Unit) {
                 onNavigateToBank = { navController.navigate("bank_transfer") },
                 onNavigateToSelfAccount = { navController.navigate("self_account") },
                 onNavigateToCheckBalance = { navController.navigate("check_balance") },
-                onQrBtnClick = {navController.navigate("scanner")},
+                onQrBtnClick = { navController.navigate("scanner") },
             )
         }
         composable("scanner") {

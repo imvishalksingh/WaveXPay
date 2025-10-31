@@ -19,12 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtpVerificationScreen(
     phoneNumber: String,
-    onVerifyOtp: (String) -> Unit,
+    onVerifyOtp: (String) -> Unit,   // ✅ Removed @Composable
     onBack: (() -> Unit)? = null
 ) {
     var otp by remember { mutableStateOf("") }
