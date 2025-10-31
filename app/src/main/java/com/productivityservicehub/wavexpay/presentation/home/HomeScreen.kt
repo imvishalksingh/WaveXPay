@@ -92,11 +92,10 @@ fun HomeScreen(
     onNavigateToSelfAccount: () -> Unit,
     onNavigateToCheckBalance: () -> Unit,
     onQrBtnClick: () -> Unit,
-
+    navController: NavController,
     ) {
     var selectedScreen by remember { mutableStateOf("Home") }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior();
-    val navController = rememberNavController()
 
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)

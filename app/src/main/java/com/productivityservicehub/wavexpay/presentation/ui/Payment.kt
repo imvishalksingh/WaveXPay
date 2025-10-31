@@ -77,6 +77,7 @@ fun WaveXApp(onRequestCameraPermission: () -> Unit) {
                 onNavigateToSelfAccount = { navController.navigate("self_account") },
                 onNavigateToCheckBalance = { navController.navigate("check_balance") },
                 onQrBtnClick = { navController.navigate("scanner") },
+                navController
             )
         }
         composable("scanner") {
