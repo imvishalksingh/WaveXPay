@@ -1,5 +1,6 @@
 package com.productivityservicehub.wavexpay.presentation.home
 
+import android.provider.CalendarContract
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.BottomAppBar
@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -47,33 +46,47 @@ import com.productivityservicehub.wavexpay.presentation.home.mainCards.MoneyTran
 import com.productivityservicehub.wavexpay.presentation.home.mainCards.PopularSection
 import com.productivityservicehub.wavexpay.presentation.home.mainCards.UtilitiesSection
 import com.productivityservicehub.wavexpay.presentation.home.qr.QRScanSection
-import com.productivityservicehub.wavexpay.presentation.home.topbar.HomeTopBar
-import com.productivityservicehub.wavexpay.presentation.wallet.transactions.TransactionHistoryScreen
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Percent
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonPin
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.navigation.NavController
 import com.productivityservicehub.wavexpay.presentation.wallet.Screen
 import com.productivityservicehub.wavexpay.presentation.wallet.WalletApp
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToScanner: () -> Unit,
-    onNavigateToSearch: () -> Unit,
-    onNavigateToWallet: () -> Unit,
-    onNavigateToNotifications: () -> Unit,
-
     onNavigateToPayToContact: () -> Unit,
     onNavigateToBank: () -> Unit,
     onNavigateToSelfAccount: () -> Unit,
@@ -81,20 +94,76 @@ fun HomeScreen(
     onQrBtnClick: () -> Unit,
 
     ) {
-    val context = LocalContext.current
     var selectedScreen by remember { mutableStateOf("Home") }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior();
     val navController = rememberNavController()
 
 
-    Scaffold(
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            WavexPayDrawerContent(
+                onActionClick = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                        drawerState.close()
+                    }
+                }
+            )
+        }
+    ) { Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            HomeTopBar(
+            TopAppBar(
+                modifier = Modifier.padding(start = 15.dp),
                 scrollBehavior = scrollBehavior,
-                onSearchClick = onNavigateToSearch,
-                onWalletClick = onNavigateToWallet,
-                onNotificationsClick = onNavigateToNotifications
+                navigationIcon = {
+                    Surface(
+                        modifier = Modifier.size(42.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFFFFFFF),
+                        onClick = {
+                            scope.launch{
+                                drawerState.open()
+                            }
+                        }
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(Icons.Default.Person, null, tint = Color.Black, modifier = Modifier.size(28.dp))
+                        }
+                    }
+                },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column {
+                            Text("Location", fontSize = 12.sp, color = Color.White)
+                            Text(
+                                "B-297, New ashok Nagar",
+                                fontSize = 10.sp,
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {navController.navigate("search")}) {
+                        Icon(Icons.Default.Search, "Search", tint = Color.White)
+                    }
+                    IconButton(onClick = {navController.navigate("wallet")}) {
+                        Icon(Icons.Default.AccountBalanceWallet, "Wallet", tint = Color.White)
+                    }
+                    IconButton(onClick ={navController.navigate("notifications")}) {
+                        Icon(Icons.Default.Notifications, "Notifications", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0041FF)
+                )
             )
         }, bottomBar = {
             BottomAppBar(modifier = Modifier.fillMaxWidth(), content = {
@@ -143,7 +212,9 @@ fun HomeScreen(
                 }
 
             }, containerColor = Color(0xFF03066E), contentColor = Color(0xFFFFFAFA))
-        }) { padding ->
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
         when (selectedScreen) {
             "Home" -> {
                 LazyColumn(
@@ -211,6 +282,13 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             UtilitiesSection()
                             Spacer(modifier = Modifier.height(80.dp))
+                            Column(modifier = Modifier.fillMaxWidth().height(150.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                                Text(text = "You ❤️ WaveXPay",fontSize = 18.sp , fontWeight = FontWeight.Bold)
+                                Text(text = "Your friends are going to \n love us too!",fontSize = 17.sp, textAlign = TextAlign.Center, fontFamily = FontFamily.SansSerif )
+                                Text(text = "Refer & Win up to $100" , color = Color.Blue , fontSize = 15.sp ,  textDecoration = TextDecoration.Underline)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(text = "Developed by VishalK. 🫶" , fontFamily = FontFamily.Cursive)
+                            }
                         }
                     }
                 }
@@ -221,6 +299,7 @@ fun HomeScreen(
             }
 
         }
+    }
     }
 }
 

@@ -53,9 +53,6 @@ fun WaveXApp(onRequestCameraPermission: () -> Unit) {
         composable("home") {
             HomeScreen(
                 onNavigateToScanner = { navController.navigate("scanner") },
-                onNavigateToSearch = { navController.navigate("search") },
-                onNavigateToWallet = { navController.navigate("wallet") },
-                onNavigateToNotifications = { navController.navigate("notifications") },
                 onNavigateToPayToContact = { navController.navigate("pay_contact") },
                 onNavigateToBank = { navController.navigate("bank_transfer") },
                 onNavigateToSelfAccount = { navController.navigate("self_account") },

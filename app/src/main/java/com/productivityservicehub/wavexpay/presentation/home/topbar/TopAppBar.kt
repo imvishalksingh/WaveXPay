@@ -1,5 +1,6 @@
 package com.productivityservicehub.wavexpay.presentation.home.topbar
 
+import androidx.annotation.RestrictTo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,53 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeTopBar(
-    scrollBehavior: TopAppBarScrollBehavior,
-    onSearchClick: () -> Unit,
-    onWalletClick: () -> Unit,
-    onNotificationsClick: () -> Unit,
-) {
-    TopAppBar(
-        scrollBehavior = scrollBehavior,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Column {
-                    Text("Location", fontSize = 12.sp, color = Color.White)
-                    Text(
-                        "B-297, New ashok Nagar",
-                        fontSize = 10.sp,
-                        color = Color.White.copy(alpha = 0.7f)
-                    )
-                }
-            }
-        },
-        actions = {
-            IconButton(onClick = onSearchClick) {
-                Icon(Icons.Default.Search, "Search", tint = Color.White)
-            }
-            IconButton(onClick = onWalletClick) {
-                Icon(Icons.Default.AccountBalanceWallet, "Wallet", tint = Color.White)
-            }
-            IconButton(onClick = onNotificationsClick) {
-                Icon(Icons.Default.Notifications, "Notifications", tint = Color.White)
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF0041FF)
-        )
-    )
-}
+import com.google.android.gms.common.api.Scope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
